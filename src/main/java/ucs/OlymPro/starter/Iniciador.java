@@ -11,5 +11,6 @@ public class Iniciador {
 		EntityManagerFactory factory = Persistence.createEntityManagerFactory("dados");
 		MainScreen frame = new MainScreen();
 		frame.setVisible(true);
+		factory.close();
 	}
 }
