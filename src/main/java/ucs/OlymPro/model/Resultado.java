@@ -7,7 +7,7 @@ import javax.persistence.Table;
 @Table(name = "RESULTADO")
 public class Resultado implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 112L;
 
     private double tempo;
     private String etapa;
@@ -35,4 +35,6 @@ public class Resultado implements Serializable {
     public String toString() {
         return "Resultado: " + tempo + " segundos, Etapa: " + etapa + ", Data: " + data;
     }
+
+	
 }

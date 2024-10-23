@@ -8,7 +8,7 @@ import javax.persistence.Table;
 @Table(name = "MODALIDADE")
 public class Modalidade implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 111L;
 
     private String nome;
     private String tipo; // "individual" ou "equipe"
@@ -23,7 +23,7 @@ public class Modalidade implements Serializable {
     public int somaPontos() {
         int totalPontos = 0;
         for (Resultado resultado : ranking) {
-            totalPontos += resultado.getPontos(); // Supondo que a classe Resultado tem um método getPontos()
+            //totalPontos += resultado.getPontos(); // Supondo que a classe Resultado tem um método getPontos()
         }
         return totalPontos;
     }

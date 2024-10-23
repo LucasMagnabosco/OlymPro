@@ -6,7 +6,7 @@ import javax.persistence.Table;
 @Table(name = "ATLETA")
 public class Atleta implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 113L;
 
     private String nome;
     private String nacionalidade;
