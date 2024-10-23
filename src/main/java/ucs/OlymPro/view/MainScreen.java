@@ -55,25 +55,22 @@ public class MainScreen extends JFrame implements ActionListener{
 		JButton btnCadastro = new JButton("Cadastro de Atletas e Equipes");
 		btnCadastro.setSize(227, 125);
 		btnCadastro.setLocation(130, 139);
+		btnCadastro.addActionListener(this);
 		contentPane.add(btnCadastro);
 		
-		cardPanel.add(contentPane, "Main");
 		
 		JButton btnMedalhas = new JButton("Quadro de medalhas");
-		btnMedalhas.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
 		btnMedalhas.setBounds(470, 139, 333, 125);
+		btnMedalhas.addActionListener(this);
 		contentPane.add(btnMedalhas);
 		
 		JButton btnPrincipal = new JButton("Painel Principal");
-		btnPrincipal.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
 		btnPrincipal.setBounds(130, 325, 673, 159);
 		contentPane.add(btnPrincipal);
+		btnPrincipal.addActionListener(this);
+		
+		
+		cardPanel.add(contentPane, "Main");
 		cardLayout.show(cardPanel, "Main");
 	}
 
