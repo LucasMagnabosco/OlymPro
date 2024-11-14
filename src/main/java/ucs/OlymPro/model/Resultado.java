@@ -5,6 +5,9 @@ import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
@@ -13,6 +16,10 @@ public class Resultado implements Serializable {
 
     private static final long serialVersionUID = 112L;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
     @Column(name="RESULT_TIME")
     private double tempo;
     @Column(name="RESULT_STAGE")

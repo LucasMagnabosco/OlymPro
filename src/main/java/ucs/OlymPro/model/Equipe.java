@@ -1,13 +1,18 @@
 package ucs.OlymPro.model;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -24,8 +29,10 @@ public class Equipe implements Serializable {
     private String nome;
     @Column(name="TEAM_COUNTRY")
     private String pais;
-    @Column(name="TEAM_ATHLETES")
-    private List<String> atletas;
+    
+    @Embedded
+	@OneToMany(fetch = FetchType.EAGER, cascade={CascadeType.ALL})
+    private Set<Atleta> atletas;
 
     @Column(name="TEAM_GOLD")
     private int ouros;
@@ -37,7 +44,7 @@ public class Equipe implements Serializable {
     public Equipe(String nome, String pais) {
         this.nome = nome;
         this.pais = pais;
-        this.atletas = new ArrayList<>();
+        this.atletas = new HashSet<Atleta>();
         this.ouros = 0;
         this.pratas = 0;
         this.bronzes = 0;
@@ -71,7 +78,7 @@ public class Equipe implements Serializable {
         return ouros + pratas + bronzes;
     }
 
-    public void adicionarAtleta(String atleta) {
+    public void adicionarAtleta(Atleta atleta) {
         atletas.add(atleta);
     }
 

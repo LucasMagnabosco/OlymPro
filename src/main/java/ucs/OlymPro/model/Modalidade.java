@@ -2,13 +2,18 @@ package ucs.OlymPro.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -25,13 +30,15 @@ public class Modalidade implements Serializable {
     private String nome;
     @Column(name="MODALITY_TYPE")
     private String tipo; // "individual" ou "equipe"
-    @Column(name="MODALITY_RANKING")
-    private List<Resultado> ranking; // Supondo que a classe Resultado já exista
+    
+    @Embedded
+	@OneToMany(fetch = FetchType.EAGER, cascade={CascadeType.ALL})
+    private Set<Resultado> ranking; // Supondo que a classe Resultado já exista
 
     public Modalidade(String nome, String tipo) {
         this.nome = nome;
         this.tipo = tipo;
-        this.ranking = new ArrayList<>();
+        this.ranking = new HashSet<Resultado>();
     }
 
     public int somaPontos() {
@@ -58,7 +65,7 @@ public class Modalidade implements Serializable {
         return tipo;
     }
 
-    public List<Resultado> getRanking() {
+    public Set<Resultado> getRanking() {
         return ranking;
     }
 
