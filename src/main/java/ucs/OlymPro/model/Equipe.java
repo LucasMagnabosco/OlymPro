@@ -29,17 +29,16 @@ public class Equipe implements Serializable {
     private String nome;
     @Column(name="TEAM_COUNTRY")
     private String pais;
-    
-    @Embedded
-	@OneToMany(fetch = FetchType.EAGER, cascade={CascadeType.ALL})
-    private Set<Atleta> atletas;
-
     @Column(name="TEAM_GOLD")
     private int ouros;
     @Column(name="TEAM_SILVER")
     private int pratas;
     @Column(name="TEAM_BRONZE")
     private int bronzes;
+    
+    @Embedded
+	@OneToMany(fetch = FetchType.EAGER, cascade={CascadeType.ALL})
+    private Set<Atleta> atletas;
 
     public Equipe(String nome, String pais) {
         this.nome = nome;

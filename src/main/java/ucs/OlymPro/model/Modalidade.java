@@ -26,7 +26,7 @@ public class Modalidade implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(name="MODALITY_")
+    @Column(name="MODALITY_NAME")
     private String nome;
     @Column(name="MODALITY_TYPE")
     private String tipo; // "individual" ou "equipe"
