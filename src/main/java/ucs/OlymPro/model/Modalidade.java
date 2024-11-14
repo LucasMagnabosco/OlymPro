@@ -1,17 +1,31 @@
+package ucs.OlymPro.model;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "MODALIDADE")
+@Table(name = "MODALITY")
 public class Modalidade implements Serializable {
 
     private static final long serialVersionUID = 111L;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(name="MODALITY_")
     private String nome;
+    @Column(name="MODALITY_TYPE")
     private String tipo; // "individual" ou "equipe"
+    @Column(name="MODALITY_RANKING")
     private List<Resultado> ranking; // Supondo que a classe Resultado já exista
 
     public Modalidade(String nome, String tipo) {

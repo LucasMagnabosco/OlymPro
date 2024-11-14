@@ -1,26 +1,42 @@
+package ucs.OlymPro.model;
+
 import java.io.Serializable;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "ATLETA")
+@Table(name = "ATHLETE")
+
 public class Atleta implements Serializable {
 
     private static final long serialVersionUID = 113L;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(name="ATHLETE_NAME")
     private String nome;
+    @Column(name="ATHLETE_NATURE")
     private String nacionalidade;
+    @Column(name="ATHLETE_AGE")
     private int idade;
-    private int id;
+    @Column(name="ATHLETE_GOLDEN")
     private int ouros;
+    @Column(name="ATHLETE_SILVER")
     private int pratas;
+    @Column(name="ATHLETE_BRONZE")
     private int bronzes;
 
-    public Atleta(String nome, String nacionalidade, int idade, int id) {
+    public Atleta(String nome, String nacionalidade, int idade) {
         this.nome = nome;
         this.nacionalidade = nacionalidade;
         this.idade = idade;
-        this.id = id;
         this.ouros = 0;
         this.pratas = 0;
         this.bronzes = 0;
@@ -64,10 +80,6 @@ public class Atleta implements Serializable {
 
     public int getIdade() {
         return idade;
-    }
-
-    public int getId() {
-        return id;
     }
 
     @Override

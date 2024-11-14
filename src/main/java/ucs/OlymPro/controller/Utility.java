@@ -1,0 +1,59 @@
+package ucs.OlymPro.controller;
+
+import javax.persistence.EntityManager;
+
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+
+import ucs.OlymPro.exceptions.ExcecaoEspacoVazio;
+import ucs.OlymPro.exceptions.ExcecaoNotNumber;
+import ucs.OlymPro.exceptions.ExcecaoObjetoJaCadastrado;
+
+public class Utility {
+	public void commit(EntityManager manager, Object obj) {
+		manager.getTransaction().begin();     
+		manager.persist(obj);
+		manager.getTransaction().commit();
+		manager.close();
+	}
+	public void duplicates(EntityManager manager, String frase, String value) throws ExcecaoObjetoJaCadastrado {
+		Session session = manager.unwrap(Session.class);
+		Query<?> q = session.createQuery(frase);
+		q.setParameter("value", value);
+		long count = (Long) q.getSingleResult();
+		if(count>0) {
+			manager.close();
+			session.close();
+			throw new ExcecaoObjetoJaCadastrado();
+		}
+	}
+	public void duplicates(EntityManager manager, String frase, int value) throws ExcecaoObjetoJaCadastrado {
+		Session session = manager.unwrap(Session.class);
+		Query<?> q = session.createQuery(frase);
+		q.setParameter("value", value);
+		long count = (Long) q.getSingleResult();
+		if(count>0) {
+			manager.close();
+			session.close();
+			throw new ExcecaoObjetoJaCadastrado();
+		}
+	}
+	
+	public void check(String... infos) throws ExcecaoEspacoVazio {
+		for(String info: infos) {
+			if(info.isEmpty()) {
+				throw new ExcecaoEspacoVazio();
+			}
+		}
+	}
+	public void checkNum(String... infos) throws ExcecaoEspacoVazio, ExcecaoNotNumber {
+		for(String info : infos) {
+			if(!info.matches("[0-9]+")) {
+				throw new ExcecaoNotNumber();
+			}
+			if(info.isEmpty()) {
+				throw new ExcecaoEspacoVazio();
+			}
+		}
+	}
+}
