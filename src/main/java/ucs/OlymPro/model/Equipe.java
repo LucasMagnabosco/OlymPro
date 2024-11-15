@@ -39,6 +39,11 @@ public class Equipe implements Serializable {
     @Embedded
 	@OneToMany(fetch = FetchType.EAGER, cascade={CascadeType.ALL})
     private Set<Atleta> atletas;
+    
+    @Embedded
+	@OneToMany(fetch = FetchType.EAGER, cascade={CascadeType.ALL})
+    Set<Resultado> tempos = new HashSet<Resultado>();
+    
 
     public Equipe(String nome, String pais) {
         this.nome = nome;
@@ -89,6 +94,13 @@ public class Equipe implements Serializable {
         return pais;
     }
 
+    public Set<Resultado> getTempos() {
+		return tempos;
+	}
+
+	public void addTempo(Resultado res) {
+		this.tempos.add(res);
+	}
 
     @Override
     public String toString() {

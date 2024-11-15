@@ -1,6 +1,8 @@
 package ucs.OlymPro.controller;
 
 
+import java.time.LocalDate;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -11,6 +13,7 @@ import ucs.OlymPro.exceptions.ExcecaoObjetoJaCadastrado;
 import ucs.OlymPro.model.Atleta;
 import ucs.OlymPro.model.Equipe;
 import ucs.OlymPro.model.Pais;
+import ucs.OlymPro.model.Resultado;
 
 public class DataController {
 
@@ -38,7 +41,7 @@ public class DataController {
 		util.commit(manager, tm);
 	}
 	
-	public void registerModal(String nome, String tipo) throws ExcecaoEspacoVazio, ExcecaoObjetoJaCadastrado {
+	public void registerModality(String nome, String tipo) throws ExcecaoEspacoVazio, ExcecaoObjetoJaCadastrado {
 		util.check(nome, tipo);
 		Equipe md = new Equipe(nome, tipo);
 		String frase = "select count(*) from Modality where modality_name = :value";
@@ -58,7 +61,26 @@ public class DataController {
 		EntityManager manager = factory.createEntityManager();
 		util.duplicates(manager, frase, nome);
 		util.commit(manager, pais);
-		
+	}
+	
+	public void registerResult(Atleta at, Equipe tm, String tempoS, String etapa, LocalDate data) throws ExcecaoEspacoVazio, ExcecaoNotNumber {
+		util.check(etapa);
+		util.checkNum(tempoS);
+		double tempo = Double.parseDouble(tempoS);
+		Resultado res = new Resultado(tempo, etapa, data);
+		EntityManager manager = factory.createEntityManager();
+		manager.getTransaction().begin();
+		manager.persist(res);
+		if (at !=null) {
+			at.addTempo(res);
+			manager.merge(at);
+		}
+		if(tm !=null) {
+			tm.addTempo(res);
+			manager.merge(tm);
+		}
+		manager.getTransaction().commit();
+		manager.close();
 	}
 	
 }
