@@ -2,10 +2,14 @@ package ucs.OlymPro.controller;
 
 
 import java.time.LocalDate;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+
+import org.hibernate.Session;
+import org.hibernate.query.Query;
 
 import ucs.OlymPro.exceptions.ExcecaoEspacoVazio;
 import ucs.OlymPro.exceptions.ExcecaoNotNumber;
@@ -81,6 +85,36 @@ public class DataController {
 		}
 		manager.getTransaction().commit();
 		manager.close();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Object[][] athelteToArray() {
+		EntityManager manager = factory.createEntityManager();
+		Session session = manager.unwrap(Session.class);
+		Query<?> q = session.createQuery("from Atleta");
+		List<Atleta> atletas = (List<Atleta>) q.getResultList();
+		Object[][] array = new Object[atletas.size()][1];
+		for(int i=0; i<atletas.size(); i++) {
+			array[i][0] = atletas.get(i).getNome();
+		}
+		session.close();
+		manager.close();
+		return array;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Object[][] teamToArray() {
+		EntityManager manager = factory.createEntityManager();
+		Session session = manager.unwrap(Session.class);
+		Query<?> q = session.createQuery("from Equipe");
+		List<Equipe> teams = (List<Equipe>) q.getResultList();
+		Object [][] teamsArray = new Object[teams.size()][1];
+		for(int i=0; i<teams.size();i++) {
+			teamsArray[i][0] = teams.get(i).getNome();
+		}
+		session.close();
+		manager.close();
+		return teamsArray;
 	}
 	
 }

@@ -24,6 +24,8 @@ public class MainScreen extends JFrame implements ActionListener{
 	private JPanel cardPanel;
 	private JLabel lblNewLabel;
 	private CardLayout cardLayout;
+	Color blue = new Color(235, 250, 250);
+	Cadastros cad = new Cadastros(this);
 	
 	public MainScreen() {
 		
@@ -34,14 +36,17 @@ public class MainScreen extends JFrame implements ActionListener{
 		cardPanel = new JPanel(cardLayout);
 		getContentPane().add(cardPanel);
 		
+		cad.setBackground(new Color(235, 250, 250));
+		cardPanel.add(cad, "Cadastros");
+		
 		contentPane = new JPanel();
-		contentPane.setBackground(SystemColor.inactiveCaptionBorder);
+		contentPane.setBackground(blue);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(null);
 		
 		JPanel header = new JPanel();
 		header.setBorder(new EmptyBorder(0, 0, 0, 0));
-		
+		header.setBackground(new Color(235, 250, 250));
 		header.setBounds(10, 0, 924, 65);
 		header.setLayout(new BoxLayout(header, BoxLayout.X_AXIS));
 		
@@ -76,7 +81,14 @@ public class MainScreen extends JFrame implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-		
+		String teste = "";
+		teste = ((JButton) e.getSource()).getText();
+		if(teste.equals("Cadastro de Atletas e Equipes")) {
+			cardLayout.show(cardPanel, "Cadastros");
+		}	
+	}
+	
+	public void menuReturn() {
+		cardLayout.show(cardPanel, "Main");
 	}
 }
