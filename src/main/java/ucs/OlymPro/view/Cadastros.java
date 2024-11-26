@@ -3,10 +3,12 @@ package ucs.OlymPro.view;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
@@ -15,6 +17,9 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import ucs.OlymPro.controller.DataController;
+import javax.swing.JTextField;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 
 
 public class Cadastros extends JPanel implements ActionListener{
@@ -22,8 +27,13 @@ public class Cadastros extends JPanel implements ActionListener{
 	private static final long serialVersionUID = 1L;
 	MainScreen ms;
 	DataController data = new DataController();
+	JButton btnTeam, btnAtl;
 	JPanel header = new JPanel();
 	Color blue = new Color(235, 250, 250);
+	private JTextField txtName;
+	private JTextField txtCountry;
+	private JTextField txtAge;
+	ImageIcon icon = new ImageIcon(Header.class.getResource("/img/cancel.png"));
 	
 	public Cadastros(MainScreen menu) {
 		this.ms = menu;
@@ -67,8 +77,19 @@ public class Cadastros extends JPanel implements ActionListener{
 		JScrollPane rolagem2 = new JScrollPane(table_team);
 		rolagem2.getViewport().setBackground(new Color(195, 196, 199));
 		rolagem2.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
-		rolagem2.setBounds(562, 244, 297, 260);
+		rolagem2.setBounds(500, 244, 297, 260);
 		add(rolagem2);
+		
+		btnAtl = new JButton("Cadastrar atleta");
+		btnAtl.setBounds(179, 123, 240, 75);
+		btnAtl.addActionListener(this);
+		add(btnAtl);
+		
+		btnTeam = new JButton("Cadastrar equipe");
+		btnTeam.setBounds(529, 123, 240, 75);
+		btnTeam.addActionListener(this);
+		add(btnTeam);
+	
 		
 	}
 	
@@ -81,6 +102,65 @@ public class Cadastros extends JPanel implements ActionListener{
 		}
 		if(teste.equals("Return")) {
 			ms.menuReturn();
+		} else if(teste.equals("Cadastrar atleta")) {
+			atlRegister();
 		}
+	}
+	
+	public void atlRegister() {
+		btnAtl.setVisible(false);
+		
+		JPanel atlPanel = new JPanel();
+		atlPanel.setBounds(144, 103, 303, 130);
+		atlPanel.setLayout(null);
+		add(atlPanel);
+		
+		JLabel lblName = new JLabel("Nome");
+		lblName.setBounds(10, 11, 46, 14);
+		atlPanel.add(lblName);
+		
+		JLabel lblCountry = new JLabel("Nacionalidade");
+		lblCountry.setBounds(10, 61, 80, 14);
+		atlPanel.add(lblCountry);
+		
+		JLabel lblAge = new JLabel("Idade");
+		lblAge.setBounds(160, 11, 46, 14);
+		atlPanel.add(lblAge);
+		
+		txtName = new JTextField();
+		txtName.setBounds(10, 29, 137, 20);
+		txtName.setColumns(10);
+		atlPanel.add(txtName);
+		
+		txtCountry = new JTextField();
+		txtCountry.setBounds(10, 86, 129, 20);
+		txtCountry.setColumns(10);
+		atlPanel.add(txtCountry);
+		
+		txtAge = new JTextField();
+		txtAge.setBounds(160, 29, 40, 20);
+		txtAge.setColumns(10);
+		atlPanel.add(txtAge);
+		
+		JButton btnRegisterAtl = new JButton("Cadastrar");
+		btnRegisterAtl.setVerticalAlignment(SwingConstants.BOTTOM);
+		btnRegisterAtl.setBounds(197, 81, 106, 30);
+		btnRegisterAtl.addActionListener(this);
+		atlPanel.add(btnRegisterAtl);
+		
+		Image newImg = icon.getImage().getScaledInstance(26, 22, Image.SCALE_SMOOTH);
+		JButton btnCancel = new JButton("");
+		btnCancel.setBounds(162, 81, 34, 30);
+		btnCancel.setIcon(new ImageIcon(newImg));
+		btnCancel.addActionListener(new ActionListener() {
+		    @Override
+		    public void actionPerformed(ActionEvent e) {
+				atlPanel.setVisible(false);
+		    	btnAtl.setVisible(true);
+
+		    }
+		});
+		atlPanel.add(btnCancel);
+		
 	}
 }
