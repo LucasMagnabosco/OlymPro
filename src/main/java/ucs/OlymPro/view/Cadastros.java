@@ -17,6 +17,10 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import ucs.OlymPro.controller.DataController;
+import ucs.OlymPro.exceptions.ExcecaoEspacoVazio;
+import ucs.OlymPro.exceptions.ExcecaoNotNumber;
+import ucs.OlymPro.exceptions.ExcecaoObjetoJaCadastrado;
+
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
@@ -33,6 +37,8 @@ public class Cadastros extends JPanel implements ActionListener{
 	private JTextField txtName;
 	private JTextField txtCountry;
 	private JTextField txtAge;
+	JTable table_team;
+	JTable table_atleta;
 	ImageIcon icon = new ImageIcon(Header.class.getResource("/img/cancel.png"));
 	
 	public Cadastros(MainScreen menu) {
@@ -45,9 +51,9 @@ public class Cadastros extends JPanel implements ActionListener{
 		header = h.getHeader(this);
 		add(header);
 		
-		Object[][] rows = data.athelteToArray();
+		Object[][] rows = data.athleteToArray();
 		String[] columns = {"Atletas"};
-		JTable table_atleta = new JTable();
+		table_atleta = new JTable();
 		table_atleta.setModel(new DefaultTableModel(rows, columns));
 		table_atleta.getColumnModel().getColumn(0).setPreferredWidth(109);
 		table_atleta.setShowVerticalLines(false);
@@ -66,7 +72,7 @@ public class Cadastros extends JPanel implements ActionListener{
 		
 		Object[][] rows2 = data.teamToArray();
 		String[] columns2 = {"Equipes"};
-		JTable table_team = new JTable();
+		table_team = new JTable();
 		table_team.setModel(new DefaultTableModel(rows2, columns2));
 		table_team.setShowVerticalLines(false);
 		table_team.setBounds(611, 295, 209, 232);
@@ -111,8 +117,9 @@ public class Cadastros extends JPanel implements ActionListener{
 		btnAtl.setVisible(false);
 		
 		JPanel atlPanel = new JPanel();
-		atlPanel.setBounds(144, 103, 303, 130);
+		atlPanel.setBounds(140, 103, 340, 130);
 		atlPanel.setLayout(null);
+		atlPanel.setBackground(blue);
 		add(atlPanel);
 		
 		JLabel lblName = new JLabel("Nome");
@@ -145,7 +152,17 @@ public class Cadastros extends JPanel implements ActionListener{
 		JButton btnRegisterAtl = new JButton("Cadastrar");
 		btnRegisterAtl.setVerticalAlignment(SwingConstants.BOTTOM);
 		btnRegisterAtl.setBounds(197, 81, 106, 30);
-		btnRegisterAtl.addActionListener(this);
+		btnRegisterAtl.addActionListener(new ActionListener() {
+		    @Override
+		    public void actionPerformed(ActionEvent e) {
+		    	try {
+					data.registerAthlete(txtName.getText(), txtCountry.getText(), txtAge.getText());
+					updateAthlete();
+				} catch (ExcecaoEspacoVazio | ExcecaoNotNumber | ExcecaoObjetoJaCadastrado e1) {
+					e1.printStackTrace();
+				}
+		    }
+		});
 		atlPanel.add(btnRegisterAtl);
 		
 		Image newImg = icon.getImage().getScaledInstance(26, 22, Image.SCALE_SMOOTH);
@@ -162,5 +179,17 @@ public class Cadastros extends JPanel implements ActionListener{
 		});
 		atlPanel.add(btnCancel);
 		
+	}
+	public void updateTeam() {
+		DefaultTableModel model = (DefaultTableModel) table_team.getModel();
+		String[] columns = {"Equipes"};
+		model.setDataVector(data.teamToArray(), columns);
+		model.fireTableDataChanged();
+	}
+	public void updateAthlete() {
+		DefaultTableModel model = (DefaultTableModel) table_atleta.getModel();
+		String[] columns = {"Pilotos", "Equipe"};
+		model.setDataVector(data.athleteToArray(), columns);
+		model.fireTableDataChanged();
 	}
 }

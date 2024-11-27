@@ -88,7 +88,7 @@ public class DataController {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Object[][] athelteToArray() {
+	public Object[][] athleteToArray() {
 		EntityManager manager = factory.createEntityManager();
 		Session session = manager.unwrap(Session.class);
 		Query<?> q = session.createQuery("from Atleta");
