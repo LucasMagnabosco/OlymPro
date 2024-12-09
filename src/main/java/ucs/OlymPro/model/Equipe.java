@@ -12,6 +12,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -27,8 +29,9 @@ public class Equipe implements Serializable {
     
     @Column(name="TEAM_NAME")
     private String nome;
-    @Column(name="TEAM_COUNTRY")
-    private String pais;
+    @ManyToOne
+    @JoinColumn(name = "country_id")
+    private Pais pais;
     @Column(name="TEAM_GOLD")
     private int ouros;
     @Column(name="TEAM_SILVER")
@@ -38,17 +41,18 @@ public class Equipe implements Serializable {
     
     @Embedded
 	@OneToMany(fetch = FetchType.EAGER, cascade={CascadeType.ALL})
-    private Set<Atleta> atletas;
+    private Set<Athlete> atletas;
     
     @Embedded
 	@OneToMany(fetch = FetchType.EAGER, cascade={CascadeType.ALL})
     Set<Resultado> tempos = new HashSet<Resultado>();
     
-
-    public Equipe(String nome, String pais) {
+    public Equipe() {}
+    
+    public Equipe(String nome, Pais pais) {
         this.nome = nome;
         this.pais = pais;
-        this.atletas = new HashSet<Atleta>();
+        this.atletas = new HashSet<Athlete>();
         this.ouros = 0;
         this.pratas = 0;
         this.bronzes = 0;
@@ -82,15 +86,18 @@ public class Equipe implements Serializable {
         return ouros + pratas + bronzes;
     }
 
-    public void adicionarAtleta(Atleta atleta) {
+    public void adicionarAtleta(Athlete atleta) {
         atletas.add(atleta);
+    }
+    public void removerAtleta(Athlete at) {
+    	atletas.remove(at);
     }
 
     public String getNome() {
         return nome;
     }
 
-    public String getPais() {
+    public Pais getPais() {
         return pais;
     }
 
@@ -106,5 +113,13 @@ public class Equipe implements Serializable {
     public String toString() {
         return "Equipe: " + nome + ", País: " + pais + ", Atletas: " + atletas +
                ", Ouro: " + ouros + ", Prata: " + pratas + ", Bronze: " + bronzes;
+    }
+
+	public Set<Athlete> getAthletes() {
+		return atletas;
+	}
+
+    public void setPais(Pais pais) {
+        this.pais = pais;
     }
 }

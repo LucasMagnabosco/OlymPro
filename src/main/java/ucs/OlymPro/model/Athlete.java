@@ -6,28 +6,29 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "ATHLETE")
 
-public class Atleta implements Serializable {
+public class Athlete implements Serializable {
 
-    private static final long serialVersionUID = 113L;
+    private static final long serialVersionUID = 1073L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
     @Column(name="ATHLETE_NAME")
-    private String nome;
+    private String name;
     @Column(name="ATHLETE_NATURE")
     private String nacionalidade;
     @Column(name="ATHLETE_AGE")
@@ -39,13 +40,19 @@ public class Atleta implements Serializable {
     @Column(name="ATHLETE_BRONZE")
     private int bronzes;
 
-    @Embedded
-	@OneToMany(fetch = FetchType.EAGER, cascade={CascadeType.ALL})
+    @ManyToOne
+    @JoinColumn(name = "country_id")
+    private Pais pais;
+    
+    @OneToMany(fetch = FetchType.EAGER, cascade={CascadeType.ALL})
     Set<Resultado> tempos = new HashSet<Resultado>();
     
-
-	public Atleta(String nome, String nacionalidade, int idade) {
-        this.nome = nome;
+    private Equipe equipe;
+    
+    public Athlete() {}
+    
+	public Athlete(String nome, String nacionalidade, int idade) {
+        this.name = nome;
         this.nacionalidade = nacionalidade;
         this.idade = idade;
         this.ouros = 0;
@@ -81,8 +88,8 @@ public class Atleta implements Serializable {
         return ouros + pratas + bronzes;
     }
 
-    public String getNome() {
-        return nome;
+    public String getName() {
+        return name;
     }
 
     public String getNacionalidade() {
@@ -101,9 +108,33 @@ public class Atleta implements Serializable {
 		this.tempos.add(res);
 	}
     
+    public Equipe getEquipe() {
+        return equipe;
+    }
+
+    public void setEquipe(Equipe novaEquipe) {
+        if (this.equipe != null) {
+            this.equipe.removerAtleta(this);
+        }
+        
+        this.equipe = novaEquipe;
+        
+        if (novaEquipe != null && !novaEquipe.getAthletes().contains(this)) {
+            novaEquipe.adicionarAtleta(this);
+        }
+    }
+    
+    public Pais getPais() {
+        return pais;
+    }
+    
+    public void setPais(Pais pais) {
+        this.pais = pais;
+    }
+    
     @Override
     public String toString() {
-        return "Atleta: " + nome + ", Nacionalidade: " + nacionalidade +
+        return "Atleta: " + name + ", Nacionalidade: " + nacionalidade +
                ", Idade: " + idade + ", Ouro: " + ouros +
                ", Prata: " + pratas + ", Bronze: " + bronzes;
     }

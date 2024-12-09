@@ -1,6 +1,5 @@
 package ucs.OlymPro.view;
 
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Image;
@@ -24,11 +23,13 @@ import ucs.OlymPro.exceptions.ExcecaoObjetoJaCadastrado;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+import javax.swing.JOptionPane;
+import java.awt.FlowLayout;
 
-
-public class Cadastros extends JPanel implements ActionListener{
+public class Cadastros extends JPanel implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
+	JPanel actionPanel;
 	MainScreen ms;
 	DataController data = new DataController();
 	JButton btnTeam, btnAtl;
@@ -40,156 +41,327 @@ public class Cadastros extends JPanel implements ActionListener{
 	JTable table_team;
 	JTable table_atleta;
 	ImageIcon icon = new ImageIcon(Header.class.getResource("/img/cancel.png"));
-	
+
 	public Cadastros(MainScreen menu) {
 		this.ms = menu;
-		setBounds(0, 0, 960, 580);
+		setBounds(100, 100, 1000, 600);
+		setBackground(blue);
 		setLayout(null);
-		
+
 		String frase = "Cadastros";
 		Header h = new Header(frase);
 		header = h.getHeader(this);
 		add(header);
-		
-		Object[][] rows = data.athleteToArray();
-		String[] columns = {"Atletas"};
-		table_atleta = new JTable();
-		table_atleta.setModel(new DefaultTableModel(rows, columns));
-		table_atleta.getColumnModel().getColumn(0).setPreferredWidth(109);
-		table_atleta.setShowVerticalLines(false);
-		table_atleta.setFont(new Font("Arial", Font.PLAIN, 11));
-		table_atleta.setBounds(140, 295, 209, 232);
-		table_atleta.setBackground(new Color(195, 196, 199));
-		table_atleta.getTableHeader().setBackground(new Color(195, 196, 199));
-		table_atleta.getTableHeader().setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
-		JScrollPane rolagem1 = new JScrollPane(table_atleta);
+
+		// Tabela de Atletas
+		String[] columnsAtleta = { "Atletas", "Equipe" };
+		table_atleta = createTable(data.athleteToArray(), columnsAtleta, true);
+		JScrollPane rolagem1 = createScrollPane(table_atleta, 150, 244, 297, 258);
 		rolagem1.setBackground(new Color(195, 196, 199));
-		rolagem1.getViewport().setBackground(new Color(195, 196, 199));
-		rolagem1.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
-		rolagem1.setBounds(150, 244, 297, 258);
 		rolagem1.getVerticalScrollBar().setBackground(Color.GRAY);
 		add(rolagem1);
-		
-		Object[][] rows2 = data.teamToArray();
-		String[] columns2 = {"Equipes"};
-		table_team = new JTable();
-		table_team.setModel(new DefaultTableModel(rows2, columns2));
-		table_team.setShowVerticalLines(false);
-		table_team.setBounds(611, 295, 209, 232);
-		table_team.setBackground(new Color(195, 196, 199));
-		table_team.setFont(new Font("Arial", Font.PLAIN, 11));
-		table_team.getTableHeader().setBackground(new Color(195, 196, 199));
-		table_team.getTableHeader().setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
-		JScrollPane rolagem2 = new JScrollPane(table_team);
-		rolagem2.getViewport().setBackground(new Color(195, 196, 199));
+
+		// Tabela de Equipes
+		String[] columnsTeam = { "Equipes" };
+		table_team = createTable(data.teamToArray(), columnsTeam, false);
+		JScrollPane rolagem2 = createScrollPane(table_team, 500, 244, 297, 260);
 		rolagem2.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
-		rolagem2.setBounds(500, 244, 297, 260);
 		add(rolagem2);
-		
+
 		btnAtl = new JButton("Cadastrar atleta");
 		btnAtl.setBounds(179, 123, 240, 75);
 		btnAtl.addActionListener(this);
 		add(btnAtl);
-		
+
 		btnTeam = new JButton("Cadastrar equipe");
 		btnTeam.setBounds(529, 123, 240, 75);
 		btnTeam.addActionListener(this);
 		add(btnTeam);
-	
-		
+
+		actionPanel = new JPanel();
+		actionPanel.setBackground(blue);
+		actionPanel.setBounds(150, 510, 647, 40);
+		actionPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 5));
+		add(actionPanel);
+
+		JButton btnDeleteAthlete = new JButton("Deletar Atleta");
+		btnDeleteAthlete.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int row = table_atleta.getSelectedRow();
+				if (row != -1) {
+					String athleteName = (String) table_atleta.getValueAt(row, 0);
+					try {
+						data.deleteAthlete(athleteName);
+						updateAthlete();
+						updateTeam();
+					} catch (Exception ex) {
+						JOptionPane.showMessageDialog(null, "Erro ao deletar atleta: " + ex.getMessage());
+					}
+				} else {
+					JOptionPane.showMessageDialog(null, "Selecione um atleta primeiro!");
+				}
+			}
+		});
+		actionPanel.add(btnDeleteAthlete);
+
+		JButton btnDeleteTeam = new JButton("Deletar Equipe");
+		btnDeleteTeam.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int row = table_team.getSelectedRow();
+				if (row != -1) {
+					String teamName = (String) table_team.getValueAt(row, 0);
+					try {
+						data.deleteTeam(teamName);
+						updateTeam();
+						updateAthlete();
+					} catch (Exception ex) {
+						JOptionPane.showMessageDialog(null, "Erro ao deletar equipe: " + ex.getMessage());
+					}
+				} else {
+					JOptionPane.showMessageDialog(null, "Selecione uma equipe primeiro!");
+				}
+			}
+		});
+		actionPanel.add(btnDeleteTeam);
+
+		JButton btnRemoveRelation = new JButton("Remover Relação");
+		btnRemoveRelation.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int athleteRow = table_atleta.getSelectedRow();
+				int teamRow = table_team.getSelectedRow();
+
+				if (athleteRow != -1 && teamRow != -1) {
+					String athleteName = (String) table_atleta.getValueAt(athleteRow, 0);
+					String teamName = (String) table_team.getValueAt(teamRow, 0);
+					try {
+						data.deleteRelation(teamName, athleteName);
+						updateAthlete();
+						updateTeam();
+					} catch (Exception ex) {
+						JOptionPane.showMessageDialog(null, "Erro ao remover relação: " + ex.getMessage());
+					}
+				} else {
+					JOptionPane.showMessageDialog(null, "Selecione um atleta e uma equipe primeiro!");
+				}
+			}
+		});
+		actionPanel.add(btnRemoveRelation);
+
+		JButton btnAddRelation = new JButton("Adicionar à Equipe");
+		btnAddRelation.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int athleteRow = table_atleta.getSelectedRow();
+				int teamRow = table_team.getSelectedRow();
+				
+				if (athleteRow != -1 && teamRow != -1) {
+					String athleteName = (String) table_atleta.getValueAt(athleteRow, 0);
+					String teamName = (String) table_team.getValueAt(teamRow, 0);
+					try {
+						data.addAthleteToTeam(teamName, athleteName);
+						updateAthlete();
+						updateTeam();
+						JOptionPane.showMessageDialog(null, "Atleta adicionado à equipe com sucesso!");
+					} catch (Exception ex) {
+						JOptionPane.showMessageDialog(null, "Erro ao adicionar atleta à equipe: " + ex.getMessage());
+					}
+				} else {
+					JOptionPane.showMessageDialog(null, "Selecione um atleta e uma equipe primeiro!");
+				}
+			}
+		});
+		actionPanel.add(btnAddRelation);
 	}
-	
+
 	public void actionPerformed(ActionEvent e) {
 		String teste = "";
-		if(e.getSource() instanceof JButton) {
+		if (e.getSource() instanceof JButton) {
 			teste = ((JButton) e.getSource()).getText();
-		}else if(e.getSource() instanceof JComboBox) {
+		} else if (e.getSource() instanceof JComboBox) {
 			teste = (String) ((JComboBox) e.getSource()).getSelectedItem();
 		}
-		if(teste.equals("Return")) {
+		if (teste.equals("Return")) {
 			ms.menuReturn();
-		} else if(teste.equals("Cadastrar atleta")) {
+		} else if (teste.equals("Cadastrar atleta")) {
+			btnAtl.setVisible(false);
 			atlRegister();
+		} else if (teste.equals("Cadastrar equipe")) {
+			btnTeam.setVisible(false);
+			teamRegister();
 		}
 	}
-	
+
 	public void atlRegister() {
-		btnAtl.setVisible(false);
-		
 		JPanel atlPanel = new JPanel();
-		atlPanel.setBounds(140, 103, 340, 130);
+		atlPanel.setBounds(140, 100, 340, 130);
 		atlPanel.setLayout(null);
 		atlPanel.setBackground(blue);
 		add(atlPanel);
-		
+
 		JLabel lblName = new JLabel("Nome");
 		lblName.setBounds(10, 11, 46, 14);
 		atlPanel.add(lblName);
-		
+
 		JLabel lblCountry = new JLabel("Nacionalidade");
 		lblCountry.setBounds(10, 61, 80, 14);
 		atlPanel.add(lblCountry);
-		
+
 		JLabel lblAge = new JLabel("Idade");
 		lblAge.setBounds(160, 11, 46, 14);
 		atlPanel.add(lblAge);
-		
+
 		txtName = new JTextField();
 		txtName.setBounds(10, 29, 137, 20);
 		txtName.setColumns(10);
 		atlPanel.add(txtName);
-		
-		txtCountry = new JTextField();
-		txtCountry.setBounds(10, 86, 129, 20);
-		txtCountry.setColumns(10);
-		atlPanel.add(txtCountry);
-		
+
+		JComboBox<String> cbCountry = new JComboBox<>(data.getCountriesArray());
+		cbCountry.setBounds(10, 86, 129, 20);
+		atlPanel.add(cbCountry);
+
 		txtAge = new JTextField();
 		txtAge.setBounds(160, 29, 40, 20);
 		txtAge.setColumns(10);
 		atlPanel.add(txtAge);
-		
+
 		JButton btnRegisterAtl = new JButton("Cadastrar");
 		btnRegisterAtl.setVerticalAlignment(SwingConstants.BOTTOM);
 		btnRegisterAtl.setBounds(197, 81, 106, 30);
 		btnRegisterAtl.addActionListener(new ActionListener() {
-		    @Override
-		    public void actionPerformed(ActionEvent e) {
-		    	try {
-					data.registerAthlete(txtName.getText(), txtCountry.getText(), txtAge.getText());
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					data.registerAthlete(txtName.getText(), (String)cbCountry.getSelectedItem(), txtAge.getText());
 					updateAthlete();
+					atlPanel.setVisible(false);
+					btnAtl.setVisible(true);
 				} catch (ExcecaoEspacoVazio | ExcecaoNotNumber | ExcecaoObjetoJaCadastrado e1) {
-					e1.printStackTrace();
+					JOptionPane.showMessageDialog(null, "Erro ao cadastrar atleta: " + e1.getMessage());
 				}
-		    }
+			}
 		});
 		atlPanel.add(btnRegisterAtl);
-		
+
 		Image newImg = icon.getImage().getScaledInstance(26, 22, Image.SCALE_SMOOTH);
 		JButton btnCancel = new JButton("");
 		btnCancel.setBounds(162, 81, 34, 30);
 		btnCancel.setIcon(new ImageIcon(newImg));
 		btnCancel.addActionListener(new ActionListener() {
-		    @Override
-		    public void actionPerformed(ActionEvent e) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
 				atlPanel.setVisible(false);
-		    	btnAtl.setVisible(true);
-
-		    }
+				btnAtl.setVisible(true);
+			}
 		});
 		atlPanel.add(btnCancel);
 		
+		revalidate();
+		repaint();
 	}
+
+	public void teamRegister() {
+		JPanel atlPanel = new JPanel();
+		atlPanel.setBounds(500, 100, 340, 130);
+		atlPanel.setLayout(null);
+		atlPanel.setBackground(blue);
+		add(atlPanel);
+
+		JLabel lblName = new JLabel("Nome");
+		lblName.setBounds(10, 11, 46, 14);
+		atlPanel.add(lblName);
+
+		JLabel lblCountry = new JLabel("País");
+		lblCountry.setBounds(10, 61, 80, 14);
+		atlPanel.add(lblCountry);
+
+		txtName = new JTextField();
+		txtName.setBounds(10, 29, 137, 20);
+		txtName.setColumns(10);
+		atlPanel.add(txtName);
+
+		JComboBox<String> cbCountry = new JComboBox<>(data.getCountriesArray());
+		cbCountry.setBounds(10, 86, 129, 20);
+		atlPanel.add(cbCountry);
+
+		JButton btnRegisterAtl = new JButton("Cadastrar");
+		btnRegisterAtl.setVerticalAlignment(SwingConstants.BOTTOM);
+		btnRegisterAtl.setBounds(197, 81, 106, 30);
+		btnRegisterAtl.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					data.registerTeam(txtName.getText(), (String)cbCountry.getSelectedItem());
+					updateTeam();
+					revalidate();
+					repaint();
+				} catch (ExcecaoEspacoVazio | ExcecaoObjetoJaCadastrado e1) {
+					JOptionPane.showMessageDialog(null, "Erro ao cadastrar equipe: " + e1.getMessage());
+				}
+			}
+		});
+		atlPanel.add(btnRegisterAtl);
+
+		Image newImg = icon.getImage().getScaledInstance(26, 22, Image.SCALE_SMOOTH);
+		JButton btnCancel = new JButton("");
+		btnCancel.setBounds(162, 81, 34, 30);
+		btnCancel.setIcon(new ImageIcon(newImg));
+		btnCancel.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				atlPanel.setVisible(false);
+				btnTeam.setVisible(true);
+			}
+		});
+		atlPanel.add(btnCancel);
+
+		revalidate();
+		repaint();
+	}
+
 	public void updateTeam() {
 		DefaultTableModel model = (DefaultTableModel) table_team.getModel();
-		String[] columns = {"Equipes"};
+		String[] columns = { "Equipes" };
+
 		model.setDataVector(data.teamToArray(), columns);
 		model.fireTableDataChanged();
 	}
+
 	public void updateAthlete() {
 		DefaultTableModel model = (DefaultTableModel) table_atleta.getModel();
-		String[] columns = {"Pilotos", "Equipe"};
+		String[] columns = { "Atletas", "Equipe" };
 		model.setDataVector(data.athleteToArray(), columns);
 		model.fireTableDataChanged();
+	}
+
+	private JTable createTable(Object[][] rows, String[] columns, boolean hasTeam) {
+		DefaultTableModel model = new DefaultTableModel(rows, columns) {
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false; // Torna todas as células não editáveis
+			}
+		};
+		
+		JTable table = new JTable(model);
+		table.setShowVerticalLines(false);
+		table.setFont(new Font("Arial", Font.PLAIN, 11));
+		table.setGridColor(new Color(200, 230, 230));
+		table.getTableHeader().setBackground(new Color(200, 230, 230));
+		
+		if (hasTeam) {
+			table.getColumnModel().getColumn(0).setPreferredWidth(109);
+		}
+		
+		return table;
+	}
+
+	private JScrollPane createScrollPane(JTable table, int x, int y, int width, int height) {
+		JScrollPane scrollPane = new JScrollPane(table);
+		scrollPane.getViewport().setBackground(new Color(242, 252, 252));
+		scrollPane.setBounds(x, y, width, height);
+		
+		return scrollPane;
 	}
 }

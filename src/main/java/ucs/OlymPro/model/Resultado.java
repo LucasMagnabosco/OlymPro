@@ -50,5 +50,9 @@ public class Resultado implements Serializable {
         return "Resultado: " + tempo + " segundos, Etapa: " + etapa + ", Data: " + data;
     }
 
+	public Object getId() {
+		return id;
+	}
+
 	
 }

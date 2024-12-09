@@ -34,15 +34,24 @@ public class Pais implements Serializable {
     @Column(name="COUNTRY_BRONZE")
     private int bronzes;
     
-    @Embedded
-	@OneToMany(fetch = FetchType.EAGER, cascade={CascadeType.ALL})
-    private Set<Atleta> atletas = new HashSet<Atleta>();
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "pais")
+    private Set<Athlete> atletas = new HashSet<Athlete>();
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "pais")
+    private Set<Equipe> equipes = new HashSet<Equipe>();
+
 
     public Pais(String nome, int ouros, int pratas, int bronzes) {
         this.nome = nome;
         this.ouros = ouros;
         this.pratas = pratas;
         this.bronzes = bronzes;
+    }
+    public Pais(String nome) {
+        this.nome = nome;
+        this.ouros = 0;
+        this.pratas = 0;
+        this.bronzes = 0;
     }
 
     public int somaOuros() {
@@ -65,12 +74,16 @@ public class Pais implements Serializable {
         return nome;
     }
     
-    public Set<Atleta> getAtletas() {
+    public Set<Athlete> getAtletas() {
 		return atletas;
 	}
 
-	public void addAtletas(Atleta a) {
+	public void addAtletas(Athlete a) {
 		this.atletas.add(a);
+	}
+
+	public void addEquipe(Equipe e) {
+		this.equipes.add(e);
 	}
 
 	@Override
