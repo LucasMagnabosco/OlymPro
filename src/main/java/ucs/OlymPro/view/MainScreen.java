@@ -4,18 +4,23 @@ package ucs.OlymPro.view;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+
+import ucs.OlymPro.controller.DataController;
 
 public class MainScreen extends JFrame implements ActionListener{
 
@@ -24,10 +29,11 @@ public class MainScreen extends JFrame implements ActionListener{
 	private JPanel cardPanel;
 	private JLabel lblNewLabel;
 	private CardLayout cardLayout;
+	DataController data = new DataController();
 	Color blue = new Color(235, 250, 250);
 	Cadastros cad = new Cadastros(this);
-	MedalBoard medal = new MedalBoard(this);
 	Paises paises = new Paises(this);
+	Etapas etapas = new Etapas(this);
 	
 	public MainScreen() {
 		
@@ -40,8 +46,8 @@ public class MainScreen extends JFrame implements ActionListener{
 		
 
 		cardPanel.add(cad, "Cadastros");
-		cardPanel.add(medal, "Medalhas");
 		cardPanel.add(paises, "Paises");
+		cardPanel.add(etapas, "Etapas");
 		
 		contentPane = new JPanel();
 		contentPane.setBackground(blue);
@@ -62,59 +68,52 @@ public class MainScreen extends JFrame implements ActionListener{
 		contentPane.add(header);
 		
 		JButton btnCadastro = new JButton("Cadastro de Atletas e Equipes");
-		btnCadastro.setBounds(130, 100, 227, 75);
+		btnCadastro.setBounds(150, 100, 227, 75);
 		btnCadastro.addActionListener(this);
 		contentPane.add(btnCadastro);
 		
-		JButton btnMedalhas = new JButton("Quadro de medalhas");
-		btnMedalhas.setBounds(370, 100, 227, 75);
-		btnMedalhas.addActionListener(this);
-		contentPane.add(btnMedalhas);
-		
-		JButton btnPaises = new JButton("Países e medalhas");
-		btnPaises.setBounds(130, 190, 227, 75);
-		btnPaises.addActionListener(this);
-		contentPane.add(btnPaises);
-		
-		JButton btnModalidades = new JButton("Gerenciar Modalidades");
-		btnModalidades.setBounds(370, 190, 227, 75);
+		JButton btnModalidades = new JButton("Gerenciar Modalidades e Etapas");
+		btnModalidades.setBounds(387, 100, 227, 75);
 		btnModalidades.addActionListener(this);
 		contentPane.add(btnModalidades);
 		
-		JButton btnEtapas = new JButton("Gerenciar Etapas");
-		btnEtapas.setBounds(610, 190, 227, 75);
-		btnEtapas.addActionListener(this);
-		contentPane.add(btnEtapas);
+		JButton btnPaises = new JButton("Países e medalhas");
+		btnPaises.setBounds(624, 100, 227, 75);
+		btnPaises.addActionListener(this);
+		contentPane.add(btnPaises);
 		
+
 		JPanel rankingPanel = new JPanel();
-		rankingPanel.setBounds(130, 325, 673, 159);
+		rankingPanel.setBounds(150, 325, 673, 200);
 		rankingPanel.setBackground(blue);
-		rankingPanel.setLayout(new BorderLayout(10, 5));
+		rankingPanel.setLayout(new BorderLayout());
 
 		String[] colunas = {"Posição", "País", "Ouro", "Prata", "Bronze", "Total"};
-		Object[][] dados = new Object[5][6];
-		for (int i = 0; i < 5; i++) {
-			dados[i][0] = i + 1;
-			dados[i][1] = "País " + i;
-			dados[i][2] = 0;
-			dados[i][3] = 0;
-			dados[i][4] = 0;
-			dados[i][5] = 0;
-		}
+		Object[][] dados = data.getTop5Paises();
 
 		JTable table = new JTable(dados, colunas);
 		table.setEnabled(false);
 		table.getTableHeader().setReorderingAllowed(false);
 		table.setRowHeight(25);
+		table.setPreferredScrollableViewportSize(new Dimension(500, 125));
+		
 		table.getTableHeader().setBackground(blue);
+		table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
+		table.getTableHeader().setForeground(Color.BLACK);
+		table.getTableHeader().setOpaque(true);
+
+		JScrollPane scrollPane = new JScrollPane(table);
+		scrollPane.setBackground(blue);
+		scrollPane.getViewport().setBackground(blue);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
 		JLabel titleLabel = new JLabel("Top 5 Países", SwingConstants.CENTER);
 		titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
 
-		rankingPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		rankingPanel.add(titleLabel, BorderLayout.NORTH);
-		rankingPanel.add(table.getTableHeader(), BorderLayout.CENTER);
-		rankingPanel.add(table, BorderLayout.SOUTH);
+		rankingPanel.add(scrollPane, BorderLayout.CENTER);
 
 		contentPane.add(rankingPanel);
 		
@@ -128,19 +127,16 @@ public class MainScreen extends JFrame implements ActionListener{
 		teste = ((JButton) e.getSource()).getText();
 		switch(teste) {
 			case "Cadastro de Atletas e Equipes":
+				cad.updateAthlete();
+				cad.updateTeam();
 				cardLayout.show(cardPanel, "Cadastros");
 				break;
-			case "Quadro de medalhas":
-				cardLayout.show(cardPanel, "Medalhas");
-				break;
 			case "Países e medalhas":
+				paises.atualizarTabela();
 				cardLayout.show(cardPanel, "Paises");
 				break;
-			case "Gerenciar Modalidades":
-				// TODO: Implementar tela de gerenciamento de modalidades
-				break;
-			case "Gerenciar Etapas":
-				// TODO: Implementar tela de gerenciamento de etapas
+			case "Gerenciar Modalidades e Etapas":
+			cardLayout.show(cardPanel, "Etapas");
 				break;
 		}
 	}

@@ -39,20 +39,24 @@ public class Equipe implements Serializable {
     @Column(name="TEAM_BRONZE")
     private int bronzes;
     
-    @Embedded
-	@OneToMany(fetch = FetchType.EAGER, cascade={CascadeType.ALL})
-    private Set<Athlete> atletas;
+    @Column(name = "IS_VOLEI")
+    private boolean isVolei;
     
     @Embedded
 	@OneToMany(fetch = FetchType.EAGER, cascade={CascadeType.ALL})
-    Set<Resultado> tempos = new HashSet<Resultado>();
+    private Set<Athlete> atletas = new HashSet<Athlete>();
+    
+    @Embedded
+	@OneToMany(fetch = FetchType.EAGER, cascade={CascadeType.ALL})
+    Set<ResultadoIndividual> tempos = new HashSet<ResultadoIndividual>();
     
     public Equipe() {}
     
-    public Equipe(String nome, Pais pais) {
+    public Equipe(String nome, Pais pais, boolean esporte) {
         this.nome = nome;
         this.pais = pais;
         this.atletas = new HashSet<Athlete>();
+        this.isVolei = esporte;
         this.ouros = 0;
         this.pratas = 0;
         this.bronzes = 0;
@@ -60,14 +64,23 @@ public class Equipe implements Serializable {
 
     public void adicionarOuro() {
         ouros++;
+        for (Athlete atleta : atletas) {
+            atleta.adicionarOuro();
+        }
     }
 
     public void adicionarPrata() {
         pratas++;
+        for (Athlete atleta : atletas) {
+            atleta.adicionarPrata();
+        }
     }
 
     public void adicionarBronze() {
         bronzes++;
+        for (Athlete atleta : atletas) {
+            atleta.adicionarBronze();
+        }
     }
 
     public int somaOuros() {
@@ -101,18 +114,25 @@ public class Equipe implements Serializable {
         return pais;
     }
 
-    public Set<Resultado> getTempos() {
+    public boolean isVolei() {
+		return isVolei;
+	}
+
+	public void setVolei(boolean isNatacao) {
+		this.isVolei = isNatacao;
+	}
+
+	public Set<ResultadoIndividual> getTempos() {
 		return tempos;
 	}
 
-	public void addTempo(Resultado res) {
+	public void addTempo(ResultadoIndividual res) {
 		this.tempos.add(res);
 	}
 
     @Override
     public String toString() {
-        return "Equipe: " + nome + ", País: " + pais + ", Atletas: " + atletas +
-               ", Ouro: " + ouros + ", Prata: " + pratas + ", Bronze: " + bronzes;
+        return "Equipe: " + nome;
     }
 
 	public Set<Athlete> getAthletes() {

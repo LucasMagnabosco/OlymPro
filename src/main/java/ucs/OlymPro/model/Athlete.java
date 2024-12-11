@@ -40,21 +40,27 @@ public class Athlete implements Serializable {
     @Column(name="ATHLETE_BRONZE")
     private int bronzes;
 
+    @Column(name = "IS_INDIVIDUAL")
+    private boolean isIndividual;
+    
     @ManyToOne
     @JoinColumn(name = "country_id")
     private Pais pais;
     
     @OneToMany(fetch = FetchType.EAGER, cascade={CascadeType.ALL})
-    Set<Resultado> tempos = new HashSet<Resultado>();
+    Set<ResultadoIndividual> tempos = new HashSet<ResultadoIndividual>();
     
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "equipe_id")
     private Equipe equipe;
     
     public Athlete() {}
     
-	public Athlete(String nome, String nacionalidade, int idade) {
+	public Athlete(String nome, String nacionalidade, int idade, boolean isInd) {
         this.name = nome;
         this.nacionalidade = nacionalidade;
         this.idade = idade;
+        this.isIndividual = isInd;
         this.ouros = 0;
         this.pratas = 0;
         this.bronzes = 0;
@@ -100,11 +106,11 @@ public class Athlete implements Serializable {
         return idade;
     }
 
-    public Set<Resultado> getTempos() {
+    public Set<ResultadoIndividual> getTempos() {
 		return tempos;
 	}
 
-	public void addTempo(Resultado res) {
+	public void addTempo(ResultadoIndividual res) {
 		this.tempos.add(res);
 	}
     
@@ -132,10 +138,16 @@ public class Athlete implements Serializable {
         this.pais = pais;
     }
     
+    public boolean isIndividual() {
+        return isIndividual;
+    }
+
+    public void setIndividual(boolean individual) {
+        this.isIndividual = individual;
+    }
+    
     @Override
     public String toString() {
-        return "Atleta: " + name + ", Nacionalidade: " + nacionalidade +
-               ", Idade: " + idade + ", Ouro: " + ouros +
-               ", Prata: " + pratas + ", Bronze: " + bronzes;
+        return "Atleta: " + name;
     }
 }

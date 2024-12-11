@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -62,7 +63,7 @@ public class Cadastros extends JPanel implements ActionListener {
 		add(rolagem1);
 
 		// Tabela de Equipes
-		String[] columnsTeam = { "Equipes" };
+		String[] columnsTeam = { "Equipes", "Esporte" };
 		table_team = createTable(data.teamToArray(), columnsTeam, false);
 		JScrollPane rolagem2 = createScrollPane(table_team, 500, 244, 297, 260);
 		rolagem2.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
@@ -91,13 +92,23 @@ public class Cadastros extends JPanel implements ActionListener {
 				int row = table_atleta.getSelectedRow();
 				if (row != -1) {
 					String athleteName = (String) table_atleta.getValueAt(row, 0);
-					try {
-						data.deleteAthlete(athleteName);
-						updateAthlete();
-						updateTeam();
-					} catch (Exception ex) {
-						JOptionPane.showMessageDialog(null, "Erro ao deletar atleta: " + ex.getMessage());
+					String teamName = (String) table_atleta.getValueAt(row, 1);
+					
+					if (teamName != null && !teamName.trim().isEmpty()) {
+						int option = JOptionPane.showConfirmDialog(
+							null,
+							"O atleta ainda pertence à equipe " + teamName
+						);
+					}else {
+						try {
+							data.deleteAthlete(athleteName);
+							updateAthlete();
+							updateTeam();
+						} catch (Exception ex) {
+							JOptionPane.showMessageDialog(null, "Erro ao deletar atleta: " + ex.getMessage());
+						}
 					}
+					
 				} else {
 					JOptionPane.showMessageDialog(null, "Selecione um atleta primeiro!");
 				}
@@ -112,13 +123,34 @@ public class Cadastros extends JPanel implements ActionListener {
 				int row = table_team.getSelectedRow();
 				if (row != -1) {
 					String teamName = (String) table_team.getValueAt(row, 0);
-					try {
-						data.deleteTeam(teamName);
-						updateTeam();
-						updateAthlete();
-					} catch (Exception ex) {
-						JOptionPane.showMessageDialog(null, "Erro ao deletar equipe: " + ex.getMessage());
+					
+					// Verifica se a equipe tem atletas
+					boolean hasAthletes = false;
+					for (int i = 0; i < table_atleta.getRowCount(); i++) {
+						String athleteTeam = (String) table_atleta.getValueAt(i, 1);
+						if (teamName.equals(athleteTeam)) {
+							hasAthletes = true;
+							break;
+						}
 					}
+					
+					if(hasAthletes) {
+					JOptionPane.showConfirmDialog(
+						null,						
+						"Esta equipe ainda possui atletas vinculados. Modifique as relações primeiro."
+						);
+
+					}else{
+						try {
+							data.deleteTeam(teamName);
+							updateTeam();
+							updateAthlete();
+						} catch (Exception ex) {
+							JOptionPane.showMessageDialog(null, "Erro ao deletar equipe: " + ex.getMessage());
+						}
+					}
+					
+					
 				} else {
 					JOptionPane.showMessageDialog(null, "Selecione uma equipe primeiro!");
 				}
@@ -191,12 +223,68 @@ public class Cadastros extends JPanel implements ActionListener {
 		} else if (teste.equals("Cadastrar equipe")) {
 			btnTeam.setVisible(false);
 			teamRegister();
+		} else if (teste.equals("Deletar Atleta")) {
+			int row = table_atleta.getSelectedRow();
+			if (row != -1) {
+				String athleteName = (String) table_atleta.getValueAt(row, 0);
+				String teamName = (String) table_atleta.getValueAt(row, 1);
+				
+					try {
+					data.deleteAthlete(athleteName);
+					updateAthlete();
+					updateTeam();
+				} catch (Exception ex) {
+					JOptionPane.showMessageDialog(null, "Erro ao deletar atleta: " + ex.getMessage());
+				}
+				
+			} else {
+				JOptionPane.showMessageDialog(null, "Selecione um atleta primeiro!");
+			}
+		} else if (teste.equals("Deletar Equipe")) {
+			int row = table_team.getSelectedRow();
+			if (row != -1) {
+				String teamName = (String) table_team.getValueAt(row, 0);
+				
+				// Verifica se a equipe tem atletas
+				boolean hasAthletes = false;
+				for (int i = 0; i < table_atleta.getRowCount(); i++) {
+					String athleteTeam = (String) table_atleta.getValueAt(i, 1);
+					if (teamName.equals(athleteTeam)) {
+						hasAthletes = true;
+						break;
+					}
+				}
+				
+				if (hasAthletes) {
+					int option = JOptionPane.showConfirmDialog(
+						null,
+						"Esta equipe ainda possui atletas vinculados. Deseja remover todas as relações e deletar a equipe?",
+						"Confirmação",
+						JOptionPane.YES_NO_OPTION
+					);
+					
+					if (option != JOptionPane.YES_OPTION) {
+						return;
+					}
+				}
+				
+				try {
+					data.deleteTeam(teamName);
+					updateTeam();
+					updateAthlete();
+				} catch (Exception ex) {
+					JOptionPane.showMessageDialog(null, "Erro ao deletar equipe: " + ex.getMessage());
+				}
+			} else {
+				JOptionPane.showMessageDialog(null, "Selecione uma equipe primeiro!");
+			}
 		}
 	}
 
 	public void atlRegister() {
 		JPanel atlPanel = new JPanel();
 		atlPanel.setBounds(140, 100, 340, 130);
+		
 		atlPanel.setLayout(null);
 		atlPanel.setBackground(blue);
 		add(atlPanel);
@@ -227,6 +315,12 @@ public class Cadastros extends JPanel implements ActionListener {
 		txtAge.setColumns(10);
 		atlPanel.add(txtAge);
 
+		// Adicionar checkbox para atleta coletivo
+		JCheckBox chkColetivo = new JCheckBox("Atleta Individual");
+		chkColetivo.setBounds(160, 61, 120, 20);
+		chkColetivo.setBackground(blue);
+		atlPanel.add(chkColetivo);
+
 		JButton btnRegisterAtl = new JButton("Cadastrar");
 		btnRegisterAtl.setVerticalAlignment(SwingConstants.BOTTOM);
 		btnRegisterAtl.setBounds(197, 81, 106, 30);
@@ -234,7 +328,10 @@ public class Cadastros extends JPanel implements ActionListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					data.registerAthlete(txtName.getText(), (String)cbCountry.getSelectedItem(), txtAge.getText());
+					data.registerAthlete(txtName.getText(), 
+									   (String)cbCountry.getSelectedItem(), 
+									   txtAge.getText(),
+									   chkColetivo.isSelected());
 					updateAthlete();
 					atlPanel.setVisible(false);
 					btnAtl.setVisible(true);
@@ -286,6 +383,16 @@ public class Cadastros extends JPanel implements ActionListener {
 		cbCountry.setBounds(10, 86, 129, 20);
 		atlPanel.add(cbCountry);
 
+		// Adicionar seleção de tipo de equipe
+		JLabel lblType = new JLabel("Tipo");
+		lblType.setBounds(160, 11, 46, 14);
+		atlPanel.add(lblType);
+
+		String[] tiposEquipe = {"Futebol", "Vôlei"};
+		JComboBox<String> cbType = new JComboBox<>(tiposEquipe);
+		cbType.setBounds(160, 29, 100, 20);
+		atlPanel.add(cbType);
+
 		JButton btnRegisterAtl = new JButton("Cadastrar");
 		btnRegisterAtl.setVerticalAlignment(SwingConstants.BOTTOM);
 		btnRegisterAtl.setBounds(197, 81, 106, 30);
@@ -293,7 +400,10 @@ public class Cadastros extends JPanel implements ActionListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					data.registerTeam(txtName.getText(), (String)cbCountry.getSelectedItem());
+					boolean isVolei = cbType.getSelectedIndex() == 1; // true para Volei, false para Futebol
+					data.registerTeam(txtName.getText(), 
+									(String)cbCountry.getSelectedItem(),
+									isVolei);
 					updateTeam();
 					revalidate();
 					repaint();
@@ -323,7 +433,7 @@ public class Cadastros extends JPanel implements ActionListener {
 
 	public void updateTeam() {
 		DefaultTableModel model = (DefaultTableModel) table_team.getModel();
-		String[] columns = { "Equipes" };
+		String[] columns = { "Equipes", "Esporte"};
 
 		model.setDataVector(data.teamToArray(), columns);
 		model.fireTableDataChanged();
@@ -352,6 +462,8 @@ public class Cadastros extends JPanel implements ActionListener {
 		
 		if (hasTeam) {
 			table.getColumnModel().getColumn(0).setPreferredWidth(109);
+		}else {
+			table.getColumnModel().getColumn(0).setPreferredWidth(200);
 		}
 		
 		return table;

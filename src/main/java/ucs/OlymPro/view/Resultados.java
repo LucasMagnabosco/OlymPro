@@ -15,7 +15,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
-public class MedalBoard extends JPanel implements ActionListener{
+public class Resultados extends JPanel implements ActionListener{
 
 	MainScreen ms;
 	private static final long serialVersionUID = 1L;
@@ -28,12 +28,17 @@ public class MedalBoard extends JPanel implements ActionListener{
 	JPanel header = new JPanel();
 
 	
-	public MedalBoard(MainScreen menu) {
+	public Resultados(MainScreen menu) {
 		this.ms = menu;
 		setBounds(100, 100, 1000, 600);
 		setBackground(blue);
 		setLayout(null);
 
+		String frase = "Medalhas";
+		Header h = new Header(frase);
+		header = h.getHeader(this);
+		add(header);
+		
 		// Inicializar as tabelas
 		tabelaFutebol = criarTabela("Futebol");
 		tabelaVolei = criarTabela("Vôlei");
@@ -41,16 +46,10 @@ public class MedalBoard extends JPanel implements ActionListener{
 		
 		// Adicionar alguns dados de teste para visualização
 		DefaultTableModel modeloFutebol = (DefaultTableModel) tabelaFutebol.getModel();
-		modeloFutebol.addRow(new Object[]{"Brasil", 2, 1, 0, 3});
-		modeloFutebol.addRow(new Object[]{"Argentina", 1, 2, 1, 4});
-		
-		String frase = "Medalhas";
-		Header h = new Header(frase);
-		header = h.getHeader(this);
 		
 
 		JPanel painelSuperior = new JPanel();
-		painelSuperior.setBounds(10, 10, 980, 40);
+		painelSuperior.setBounds(10, 85, 980, 40);
 		painelSuperior.setBackground(blue);
 		String[] esportes = {"Futebol", "Vôlei", "Natação"};
 		seletorEsporte = new JComboBox<>(esportes);
@@ -62,7 +61,7 @@ public class MedalBoard extends JPanel implements ActionListener{
 		painelTabela = new JPanel(new BorderLayout());
 		int tabelaLargura = 686;
 		int margemLateral = 157;
-		painelTabela.setBounds(margemLateral, 60, tabelaLargura, 480);
+		painelTabela.setBounds(margemLateral, 135, tabelaLargura, 400);
 		painelTabela.setBackground(blue);
 		
 		// Primeira chamada manual para mostrar a tabela inicial
@@ -70,11 +69,10 @@ public class MedalBoard extends JPanel implements ActionListener{
 		
 		add(painelSuperior);
 		add(painelTabela);
-		add(header);
 
 	}
 	
-	private void atualizarTabelaVisivel() {
+	public void atualizarTabelaVisivel() {
 		painelTabela.removeAll();
 		String esporteSelecionado = (String) seletorEsporte.getSelectedItem();
 		
@@ -93,7 +91,10 @@ public class MedalBoard extends JPanel implements ActionListener{
 		
 		if (tabelaAtual != null) {
 			JScrollPane scrollPane = new JScrollPane(tabelaAtual);
+			// Configurar cores do ScrollPane
 			scrollPane.setBackground(new Color(242, 252, 252));
+			scrollPane.getViewport().setBackground(new Color(242, 252, 252));
+			
 			painelTabela.add(scrollPane, BorderLayout.CENTER);
 		}
 		
@@ -102,21 +103,30 @@ public class MedalBoard extends JPanel implements ActionListener{
 	}
 	
 	private JTable criarTabela(String esporte) {
-		String[] colunas = {"País", "Ouro", "Prata", "Bronze", "Total"};
+		String[] colunas;
+		if (esporte.equals("Natação")) {
+			colunas = new String[]{"País", "Atleta", "Prova", "Medalha"};
+		} else {
+			// Para Futebol e Vôlei que são esportes em equipe
+			colunas = new String[]{"País", "Equipe", "Medalha"};
+		}
+		
 		DefaultTableModel modelo = new DefaultTableModel(colunas, 0) {
 			@Override
 			public boolean isCellEditable(int row, int column) {
 				return false;
 			}
 		};
+		
+		JTable tabela = new JTable(modelo);
+		tabela.getTableHeader().setReorderingAllowed(false);
+		
+		// Cores personalizadas
 		Color backgroundPrimary = new Color(242, 252, 252);
 		Color backgroundAlternate = new Color(225, 240, 240);
 		Color headerColor = new Color(200, 230, 230);
 		
-		JTable tabela = new JTable(modelo);
-		tabela.getTableHeader().setReorderingAllowed(false);
-		tabela.setBackground(backgroundPrimary);
-	
+		// Configurar cores da tabela
 		tabela.setBackground(backgroundPrimary);
 		tabela.setForeground(Color.BLACK);
 		tabela.setGridColor(headerColor);
@@ -134,10 +144,14 @@ public class MedalBoard extends JPanel implements ActionListener{
 					boolean isSelected, boolean hasFocus, int row, int column) {
 				Component c = super.getTableCellRendererComponent(table, value,
 						isSelected, hasFocus, row, column);
+				
 				if (!isSelected) {
 					c.setBackground(row % 2 == 0 ? backgroundPrimary : backgroundAlternate);
 				}
+				
+				// Centralizar o conteúdo das células
 				setHorizontalAlignment(JLabel.CENTER);
+				
 				return c;
 			}
 		};
@@ -151,7 +165,7 @@ public class MedalBoard extends JPanel implements ActionListener{
 	}
 	
 
-	public void adicionarPais(String esporte, String pais, int ouro, int prata, int bronze) {
+	public void adicionarResultado(String esporte, String pais, String vencedor, String prova, String medalha) {
 		JTable tabela = null;
 		switch(esporte.toLowerCase()) {
 			case "futebol":
@@ -167,7 +181,11 @@ public class MedalBoard extends JPanel implements ActionListener{
 		
 		if (tabela != null) {
 			DefaultTableModel modelo = (DefaultTableModel) tabela.getModel();
-			modelo.addRow(new Object[]{pais, ouro, prata, bronze, ouro + prata + bronze});
+			if (esporte.equalsIgnoreCase("natação")) {
+				modelo.addRow(new Object[]{pais, vencedor, prova, medalha});
+			} else {
+				modelo.addRow(new Object[]{pais, vencedor, medalha});
+			}
 		}
 	}
 
